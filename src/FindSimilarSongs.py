@@ -16,5 +16,7 @@ def findSongs(songs, num):
     return newPlaylist
 
 if __name__ == "__main__":
-    input_data = sys.argv[1]
-    print(input_data, 3)
+    input_data = sys.argv[1:]
+
+    
+    print(input_data)

@@ -1,34 +1,35 @@
-const http = require('http');
+const express = require('express');
+const cors = require('cors'); // Import cors
 const { spawn } = require('child_process');
+const path = require('path');
 
-// Create HTTP server
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  res.end('Hello, World!\n');
+const app = express();
+const PORT = 3000;
+
+app.use(cors()); // Enable CORS for all origins
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.post('/run-Python', (req, res) => {
+  const pythonFileName = req.body.pythonFileName
+  const data = req.body.data || [];
+  const python = spawn('python', [path.join(__dirname, 'src', pythonFileName), ...data.map(String)]);
+
+  let output = '';
+  python.stdout.on('data', (data) => {
+      output += data.toString();
+  });
+
+  python.stderr.on('data', (data) => {
+      console.error(`Error from Python: ${data.toString()}`);
+  });
+
+  python.on('close', (code) => {
+      console.log(`Python process exited with code ${code}`);
+      res.json({ output }); // Send the Python output back to the frontend
+  });
 });
 
-server.listen(3000, 'localhost', () => {
-  console.log('Server running at http://localhost:3000/');
-});
-
-// Data to pass to Python script
-const data = [1, 4]; // Sample data, can be dynamically passed
-
-// Spawn Python process
-const python = spawn('python', ['src/FindSimilarSongs.py', ...data.map(String)]);
-
-// Handle output from Python
-python.stdout.on('data', (data) => {
-  console.log(`Output from Python: ${data.toString()}`);
-});
-
-// Handle errors (if any)
-python.stderr.on('data', (data) => {
-  console.error(`Error from Python: ${data.toString()}`);
-});
-
-// Handle Python process exit
-python.on('close', (code) => {
-  console.log(`Python process exited with code ${code}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
