@@ -10,7 +10,7 @@ def songsInDB():
     )
 
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM songs")
+    cursor.execute("SELECT id, name FROM songs")
     output = cursor.fetchall()
     connection.close()
     cursor.close()

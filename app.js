@@ -1,3 +1,4 @@
+const SpotifyWebApi = require('spotify-web-api-node');
 const express = require('express');
 const cors = require('cors'); // Import cors
 const { spawn } = require('child_process');
@@ -33,3 +34,19 @@ app.post('/run-Python', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+const spotifyApi = new SpotifyWebApi({ // change this so it reads a csv file
+    clientId: '9b3f9898efce40ee8dcc3de9907bea84', 
+    clientSecret: '5a1e258ec5fb49328527b44554006bc6', 
+});
+
+// Get an access token
+spotifyApi.clientCredentialsGrant().then(
+    (data) => {
+        console.log('Access token retrieved:', data.body['access_token']);
+        spotifyApi.setAccessToken(data.body['access_token']);
+    },
+    (err) => {
+        console.error('Error retrieving access token:', err);
+    }
+);
