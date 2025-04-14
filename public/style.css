@@ -1,0 +1,9 @@
+body {
+    background-color: #168280;
+    display: flexbox
+}
+
+.Playlist_Input {
+    display : grid;
+    
+}
