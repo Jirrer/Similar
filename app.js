@@ -1,3 +1,4 @@
+const SpotifyWebApi = require('spotify-web-api-node');
 const express = require('express');
 const cors = require('cors'); // Import cors
 const { spawn } = require('child_process');
