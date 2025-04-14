@@ -7,12 +7,66 @@
 #include <cstdlib>
 #include <memory>
 #include <array>
+#include <sstream>
+#include <vector>
 
 using namespace std;
 
+
+vector<string> split(const string& str, char delimiter) {
+    vector<string> tokens;
+    stringstream ss(str);
+    string token;
+    
+    while (getline(ss, token, delimiter)) {
+        tokens.push_back(token);
+    }
+    
+    return tokens;
+}
+
+queue<Song> getNewSongs(int len, Playlist& currPlaylist) {
+    queue<Song> newSongs;
+    
+    
+    string command = "python GetSimilarSongs.py \""  + to_string(len) + "|" + currPlaylist.getPlaylistInfo();
+    
+    array<char, 128> buffer;
+    string result;
+    FILE* pipe = popen(command.c_str(), "r");
+    
+    if (!pipe) {
+        throw runtime_error("Failed to run Python script!");
+    }
+    
+    while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
+        result += buffer.data(); 
+    }
+    
+    fclose(pipe);
+    
+    vector<string> songs = split(result, '|');
+    
+    for (string x : songs) { // |Title~Artist~Spotify ID~Apple Music ID|
+        vector<string> parsedSong = split(x, '~');
+        if (parsedSong.size() < 4) continue;
+
+        string title = parsedSong[0];
+        string artist = parsedSong[1];
+        string spotifyID = parsedSong[2];
+        string appleMusicID = parsedSong[3];
+        
+        Song newSong = Song(title, artist, spotifyID, appleMusicID);
+        
+        newSongs.push(newSong);
+        
+    }
+    
+    return newSongs;
+}
+
 int findSongs(queue<Song> songs, Playlist& currPlaylist, Playlist& newPlaylist) {
     int addedSongs = 0;
-
 
     while (!songs.empty()) {
             Song selectedSong = songs.front();
@@ -29,68 +83,31 @@ int findSongs(queue<Song> songs, Playlist& currPlaylist, Playlist& newPlaylist) 
     
 }
 
+Playlist submittedPlaylist(string data) {
+    Playlist currPlaylist; // get input data
 
+    currPlaylist.addSong(Song("Lying from You", "Linkin Park", "3BmjRmFTESgWZLPSVGp8aG", "NULL"));
+    currPlaylist.addSong(Song("Always", "Saliva", "7kpa6MWRrPaF3b6C0DgioK", "NULL"));
+    currPlaylist.addSong(Song("The Red", "Chevelle", "1gyee1JuFFiP476LQpRMYU", "NULL"));
 
-queue<Song> getNewSongs(int len, Playlist& currPlaylist) {
-    queue<Song> newSongs;
+    return currPlaylist;
 
-
-    std::string command = "python GetSimilarSongs.py \"" + currPlaylist.getPlaylistNames() + "\"";
-    
-    // Use popen to capture the output of the Python script
-    std::array<char, 128> buffer;
-    std::string result;
-    FILE* pipe = popen(command.c_str(), "r");
-
-    if (!pipe) {
-        throw std::runtime_error("Failed to run Python script!");
-    }
-
-    while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
-        result += buffer.data(); // Append the result to the output string
-    }
-
-    fclose(pipe);
-
-    newSongs.push(result);
-
-    
-    return newSongs;
 }
 
 int main() {
-    Playlist currPlaylist; // get input data
-    currPlaylist.addSong(Song("Imagine"));
-    currPlaylist.addSong(Song("Bohemian Rhapsody"));
-    currPlaylist.addSong(Song("Like a Rolling Stone"));
-    currPlaylist.addSong(Song("Smells Like Teen Spirit"));
-    currPlaylist.addSong(Song("What's Going On"));
-    currPlaylist.addSong(Song("Respect"));
-    currPlaylist.addSong(Song("Hey Jude"));
-    currPlaylist.addSong(Song("Billie Jean"));
-    currPlaylist.addSong(Song("Sweet Child O' Mine"));
-    currPlaylist.addSong(Song("Rolling in the Deep"));
-    currPlaylist.addSong(Song("Shape of You"));
-    currPlaylist.addSong(Song("Crazy in Love"));
-    currPlaylist.addSong(Song("Thunder Road"));
-    currPlaylist.addSong(Song("Born to Run"));
-    currPlaylist.addSong(Song("Total Eclipse of the Heart"));
-    currPlaylist.addSong(Song("I Will Always Love You"));
-    currPlaylist.addSong(Song("Yesterday"));
-    currPlaylist.addSong(Song("Fight the Power"));
-    currPlaylist.addSong(Song("A Change Is Gonna Come"));
-    currPlaylist.addSong(Song("Good Vibrations"));
-
+    Playlist currPlaylist = submittedPlaylist("temp"); //user submitted
     Playlist newPlaylist; 
 
     int addedSongs = 0;
 
-    // while (addedSongs < 30) {
-    // }
+    while (addedSongs < 30) {
+        addedSongs += findSongs(getNewSongs(30, currPlaylist), currPlaylist, newPlaylist);
+    }
+        
 
+    cout << "\n\nprinting songs";
+    cout << newPlaylist.getPlaylistInfo();
+    cout << newPlaylist.getPlaylistSize();
 
-    addedSongs += findSongs(getNewSongs(30, currPlaylist), currPlaylist, newPlaylist);
-
-    cout << newPlaylist.getPlaylistNames();
 
 }
