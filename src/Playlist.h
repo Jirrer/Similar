@@ -27,7 +27,7 @@ class Playlist {
         string tempSongs;
 
         for (const Song& song : songs) {
-            tempSongs += song.getName() + " | " + song.getArtist();
+            tempSongs += song.getName() + " | " + song.getArtist() + " | " + song.getSpotifyCode() + " | " + song.getAppleCode();
         }
 
         return tempSongs;

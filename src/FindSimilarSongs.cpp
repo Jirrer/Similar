@@ -38,6 +38,8 @@ queue<Song> getNewSongs(int len, Playlist& currPlaylist) {
     if (!pipe) {
         throw runtime_error("Failed to run Python script!");
     }
+
+    cout << "Generating Playlist..." << endl;
     
     while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
         result += buffer.data(); 
@@ -50,7 +52,6 @@ queue<Song> getNewSongs(int len, Playlist& currPlaylist) {
     for (string x : songs) { // |Title~Artist~Spotify ID~Apple Music ID|
         vector<string> parsedSong = split(x, '~');
         if (parsedSong.size() < 4) continue;
-
         string title = parsedSong[0];
         string artist = parsedSong[1];
         string spotifyID = parsedSong[2];
@@ -83,31 +84,61 @@ int findSongs(queue<Song> songs, Playlist& currPlaylist, Playlist& newPlaylist) 
     
 }
 
-Playlist submittedPlaylist(string data) {
-    Playlist currPlaylist; // get input data
+Playlist submittedPlaylist(string url) {
+    Playlist currPlaylist; 
 
-    currPlaylist.addSong(Song("Lying from You", "Linkin Park", "3BmjRmFTESgWZLPSVGp8aG", "NULL"));
-    currPlaylist.addSong(Song("Always", "Saliva", "7kpa6MWRrPaF3b6C0DgioK", "NULL"));
-    currPlaylist.addSong(Song("The Red", "Chevelle", "1gyee1JuFFiP476LQpRMYU", "NULL"));
+    string command = "python UserPlaylist.py \""  + url;
+    
+    array<char, 128> buffer;
+    string result;
+    FILE* pipe = popen(command.c_str(), "r");
+    
+    if (!pipe) {
+        throw runtime_error("Failed to parse user playlist!");
+    }
+    
+    while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
+        result += buffer.data(); 
+    }
+    
+    fclose(pipe);
 
+    vector<string> songs = split(result, '|');
+    
+    for (string x : songs) { // |Title~Artist~Spotify ID~Apple Music ID|
+        vector<string> parsedSong = split(x, '~');
+
+        if (parsedSong.size() < 4) continue;
+
+        string title = parsedSong[0];
+        string artist = parsedSong[1];
+        string spotifyID = parsedSong[2];
+        string appleMusicID = parsedSong[3];
+        
+        Song newSong = Song(title, artist, spotifyID, appleMusicID);
+        
+        currPlaylist.addSong(newSong);
+    }
+ 
     return currPlaylist;
 
 }
 
 int main() {
-    Playlist currPlaylist = submittedPlaylist("temp"); //user submitted
+    int length_of_new_playlist = 30;
+
+
+    Playlist currPlaylist = submittedPlaylist("https://open.spotify.com/playlist/5h92YREtpdZ2A3ZZnSp3pC?si=efb985420c304d75"); //user submitted
     Playlist newPlaylist; 
 
     int addedSongs = 0;
 
-    while (addedSongs < 30) {
-        addedSongs += findSongs(getNewSongs(30, currPlaylist), currPlaylist, newPlaylist);
+    while (addedSongs < length_of_new_playlist) {
+        addedSongs += findSongs(getNewSongs(length_of_new_playlist - addedSongs, currPlaylist), currPlaylist, newPlaylist);
     }
         
 
     cout << "\n\nprinting songs";
-    cout << newPlaylist.getPlaylistInfo();
+    cout << newPlaylist.getPlaylistInfo() << endl;
     cout << newPlaylist.getPlaylistSize();
-
-
 }
