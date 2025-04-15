@@ -9,33 +9,32 @@
 using namespace std;
 
 class Playlist {
-    private: unordered_set<string> songs;
+    private: unordered_set<Song> songs;
 
     public: 
-    bool songInPlaylist(Song song) {
-        string songName = song.getName();
-
-        if (songs.find(songName) != songs.end()) { return true; }
-        else {return false; }
-    }
-
     Playlist() = default;
+
+    bool songInPlaylist(const Song& song) {
+        return songs.find(song) != songs.end();
+    }
     
     bool addSong(Song song){
-        if (!songInPlaylist(song)) { songs.insert(song.getName()); return true; }
+        if (!songInPlaylist(song)) { songs.insert(song); return true; }
         else { return false; }
     }
 
-    string getPlaylistNames() {
+    string getPlaylistInfo() {
         string tempSongs;
 
-        for (const string& song : songs) {
-            tempSongs += ", " + song;
+        for (const Song& song : songs) {
+            tempSongs += song.getName() + " | " + song.getArtist() + " | " + song.getSpotifyCode() + " | " + song.getAppleCode();
         }
 
         return tempSongs;
 
     }
+
+    int getPlaylistSize() {return songs.size(); }
 
 };
 
