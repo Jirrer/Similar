@@ -1,48 +1,46 @@
-submittedPlaylist = [] // needs to be sumbitted
+let musicType = "SPOTIFY";
 
-
-function getSubmittedPlaylist() {
-    return submittedPlaylist;
+function login() {
+    window.location.href = "mainPage.html";
 }
 
-function submitPlaylist(playlist) {
-    submittedPlaylist = playlist;
+function musicTypeSpotify() {
+    document.getElementById("Playlist_Field").placeholder="Paste The Link of Your Spotify Playlist";
+    musicType = "SPOTIFY";
 }
 
-async function findNewSongs() {
-    try {
-        const response = await fetch('http://localhost:3000/run-python', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ // Send data to the backend
-                pythonFileName: 'FindSimilarSongs.py',
-                data: getSubmittedPlaylist()
-            }), 
-        })
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        return result.output;
-    } catch (e) {
-        console.error('Error:',e)
-        return 'Error returning .py file'
+function musicTypeApple() {
+    document.getElementById("Playlist_Field").placeholder="Paste The Link of Your Apple Music Playlist";
+    musicType = "APPLE";
+}
+
+
+function getType() { // only allows for spotify right now
+    return "SPOTIFY"
+
+}
+
+function submitPlaylist() {
+    const playlist = document.getElementById('Playlist_Field').value;
+
+    if (musicType == getType(playlist)) {
+        sendPlaylist()
     }
+
 }
 
+function sendPlaylist() { // need to still check if its real url
+    const playlist = document.getElementById('Playlist_Field').value;
 
-// test functions
-
-
-async function updateText(newText) {
-    const output = await newText
-    document.getElementById('output').innerText = output
-}
-
-function getNewPlaylist() {
-    updateText(findNewSongs())
-}
+    fetch('http://localhost:3000/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ playlist, musicType })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Server responded with:', data);
+    });
+  }

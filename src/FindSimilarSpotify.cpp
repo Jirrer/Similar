@@ -29,7 +29,7 @@ queue<Song> getNewSongs(int len, Playlist& currPlaylist) {
     queue<Song> newSongs;
     
     
-    string command = "python GetSimilarSongs.py \""  + to_string(len) + "|" + currPlaylist.getPlaylistInfo();
+    string command = "python src/GetSimilarSongs.py \""  + to_string(len) + "|" + currPlaylist.getPlaylistInfo();
     
     array<char, 128> buffer;
     string result;
@@ -87,7 +87,7 @@ int findSongs(queue<Song> songs, Playlist& currPlaylist, Playlist& newPlaylist) 
 Playlist submittedPlaylist(string url) {
     Playlist currPlaylist; 
 
-    string command = "python UserPlaylist.py \""  + url;
+    string command = "python src/UserPlaylist.py \""  + url;
     
     array<char, 128> buffer;
     string result;
@@ -125,10 +125,12 @@ Playlist submittedPlaylist(string url) {
 }
 
 int main() {
+    string input;
+    getline(cin, input);
+
     int length_of_new_playlist = 30;
 
-
-    Playlist currPlaylist = submittedPlaylist("https://open.spotify.com/playlist/5h92YREtpdZ2A3ZZnSp3pC?si=efb985420c304d75"); //user submitted
+    Playlist currPlaylist = submittedPlaylist(input); //user submitted
     Playlist newPlaylist; 
 
     int addedSongs = 0;
