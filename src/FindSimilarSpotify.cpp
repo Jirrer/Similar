@@ -124,9 +124,33 @@ Playlist submittedPlaylist(string url) {
 
 }
 
+bool verifyPlaylist(string uncheckedPlaylist) {
+    string command = "python src/VerifyPlaylist.py \""  + uncheckedPlaylist;
+    
+    array<char, 128> buffer;
+    string result;
+    FILE* pipe = popen(command.c_str(), "r");
+    
+    if (!pipe) {
+        throw runtime_error("Failed to parse user playlist!");
+    }
+    
+    while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
+        result += buffer.data(); 
+    }
+    
+    int exitCode = pclose(pipe);
+
+    if (exitCode == 3) { return false; } 
+    else if (exitCode == 1) { return true; } 
+    else { return true; }
+}
+
 int main() {
     string input;
     getline(cin, input);
+
+    if (!verifyPlaylist(input)) {exit(2); }
 
     int length_of_new_playlist = 30;
 
@@ -139,7 +163,6 @@ int main() {
         addedSongs += findSongs(getNewSongs(length_of_new_playlist - addedSongs, currPlaylist), currPlaylist, newPlaylist);
     }
         
-
     cout << "\n\nprinting songs";
     cout << newPlaylist.getPlaylistInfo() << endl;
     cout << newPlaylist.getPlaylistSize();

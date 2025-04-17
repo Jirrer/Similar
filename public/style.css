@@ -6,10 +6,25 @@ body {
     margin: 0;
 }
 
+#title {
+    padding-left: 50%;
+    padding-right: 50%;
+    padding-top: 20%;
+    padding-bottom: 10%;
+    width: 100%;
+    text-align: center;
+    font-family: 'Inter';
+    font-weight: 100;
+    font-size: 180px;
+    grid-template-columns: 1 / -1;
+
+}
+
+
+
 .Playlist_Input {
     display: flex;
     flex-direction: column;
-    margin-top: 25%;
     margin-right: 25%;
     margin-left: 25%;
     grid-column: 1 / -1;

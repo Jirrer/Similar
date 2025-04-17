@@ -12,7 +12,6 @@ client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
 auth_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
 sp = spotipy.Spotify(auth_manager=auth_manager)
 
-
 def getAppleCode(title):
     return "Null"
 

@@ -11,7 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 
-function generatePlaylist(playlist, musicType) {
+function generatePlaylist(playlist, musicType, res) {
   if (musicType == "SPOTIFY") {
     const cpp = spawn('./src/FindSimilarSpotify');
 
@@ -28,21 +28,24 @@ function generatePlaylist(playlist, musicType) {
     
     cpp.on('close', (code) => {
       console.log(`C++ process exited with code ${code}`);
+
+      if (code === 2) {
+        res.status(400).json({ message: 'Invalid Playlist or Spotify Issue', code: 2 });
+      } else {
+        res.json({ message: 'Playlist generated successfully', code: code });
+      }
     });
     
   }
-
 }
 
 app.post('/send', (req, res) => {
   const { playlist, musicType } = req.body;
   console.log('Received:', playlist, musicType);
 
-  generatePlaylist(playlist, musicType);
-
-  res.json({ message: 'Received successfully', playlist, musicType });
+  // Only send response inside generatePlaylist
+  generatePlaylist(playlist, musicType, res);
 });
-
 
 
 app.listen(PORT, () => {
