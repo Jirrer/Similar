@@ -38,8 +38,6 @@ queue<Song> getNewSongs(int len, Playlist& currPlaylist) {
     if (!pipe) {
         throw runtime_error("Failed to run Python script!");
     }
-
-    cout << "Generating Playlist..." << endl;
     
     while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
         result += buffer.data(); 
@@ -163,7 +161,5 @@ int main() {
         addedSongs += findSongs(getNewSongs(length_of_new_playlist - addedSongs, currPlaylist), currPlaylist, newPlaylist);
     }
         
-    cout << "\n\nprinting songs";
-    cout << newPlaylist.getPlaylistInfo() << endl;
-    cout << newPlaylist.getPlaylistSize();
+   newPlaylist.printSpotifyCodes();
 }

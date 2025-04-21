@@ -1,7 +1,12 @@
 let musicType = "SPOTIFY";
+let cppOutput = localStorage.getItem('cppOutput') || "No Playlist Information"
 
 function login() {
     window.location.href = "mainPage.html";
+}
+
+function waiting() {
+  window.location.href = "waitingPage.html";
 }
 
 function musicTypeSpotify() {
@@ -54,7 +59,8 @@ function sendPlaylist() {
     if (data.code === 2) {
       alert('Error: Invalid Playlist or Spotify Issue');
     } else {
-      alert('Playlist generated successfully!');
+      localStorage.setItem('cppOutput', data.cppOutput);
+      window.location.href = "playlistPage.html";
     }
 
     playlistField.value = "";
@@ -68,3 +74,24 @@ function sendPlaylist() {
     playlistField.placeholder = "Please enter a valid Spotify playlist URL";
   });
 }
+
+function loadPlaylist() {
+  let codes = cppOutput.split('|'); // Split the cppOutput string into an array
+  let frameBase = "frame";
+
+  for (let count = 0; count < codes.length; count++) {
+    
+    let frameId = frameBase + (count + 1); // e.g., frame1, frame2...
+    let code = codes[count].trim(); // trim to remove extra spaces if any
+    
+    console.log(code);
+    let frameElement = document.getElementById(frameId);
+    if (frameElement) {
+      frameElement.src = "https://open.spotify.com/embed/track/" + code + "?utm_source=generator";
+    }
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  loadPlaylist();
+});
