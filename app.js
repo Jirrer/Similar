@@ -14,36 +14,38 @@ app.use(express.static("public"));
 function generatePlaylist(playlist, musicType, res) {
   console.log("Generating Playlist...");
 
-  if (musicType == "SPOTIFY") {
-    const cpp = spawn('./src/FindSimilarSpotify');
+  
+  const cpp = spawn('./src/FindSimilarSongs');
+  
+  input = musicType + "|" + playlist;
 
-    cpp.stdin.write(playlist);
-    cpp.stdin.end();
+  cpp.stdin.write(input);
+  cpp.stdin.end();
 
-    let cppOutput = ""; // <-- capture output here
+  let cppOutput = ""; // <-- capture output here
 
-    cpp.stdout.on('data', (data) => {
-      cppOutput += data.toString(); // accumulate chunks
-    });
+  cpp.stdout.on('data', (data) => {
+    cppOutput += data.toString(); // accumulate chunks
+  });
 
-    cpp.stderr.on('data', (data) => {
-      console.error(`C++ Error: ${data.toString()}`);
-    });
+  cpp.stderr.on('data', (data) => {
+    console.error(`C++ Error: ${data.toString()}`);
+  });
 
-    cpp.on('close', (code) => {
-      console.log(`C++ process exited with code ${code}`);
+  cpp.on('close', (code) => {
+    console.log(`C++ process exited with code ${code}`);
 
-      if (code === 2) {
-        res.status(400).json({ message: 'Invalid Playlist or Spotify Issue', code: 2 });
-      } else {
-        res.json({
-          message: 'Playlist generated successfully',
-          code: code,
-          cppOutput: cppOutput.trim() // <-- send cout output here
-        });
-      }
-    });
-  }
+    if (code === 2) {
+      res.status(400).json({ message: 'Invalid Playlist or Spotify Issue', code: 2 });
+    } else {
+      res.json({
+        message: 'Playlist generated successfully',
+        code: code,
+        cppOutput: cppOutput.trim() // <-- send cout output here
+      });
+    }
+  });
+  
 }
 
 app.post('/send', (req, res) => {

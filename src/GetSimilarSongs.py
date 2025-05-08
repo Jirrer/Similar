@@ -11,17 +11,7 @@ def getAppleCode(song):
     return "NULL"
 
 
-
-def verifyTrack(songID, title, sp): #fix
-    # track = sp.track(songID)
-    # trackName = track['name']
-
-    # return trackName.lower() == title.lower()
-    return True
-
-
 def getSpotifyCode(song):
-
     client_id = os.getenv("SPOTIFY_CLIENT_ID")
     client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
 
@@ -34,8 +24,7 @@ def getSpotifyCode(song):
         track = info['tracks']['items'][0]
         songID = track['id']
 
-        if verifyTrack(songID, song, sp):
-            return songID
+        return songID
 
     return "Null"
 

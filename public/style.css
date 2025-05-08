@@ -113,9 +113,48 @@ body {
 #returnButton {
     grid-column: 1 / -1;
     cursor: pointer;
+    height: 75px;
+    margin: 5px;
+    border-radius: 100px;
 }
 
 #result, #newPlaylist_title {
     display: block !important;
     visibility: visible !important;
+}
+
+#loadingTitle {
+    font-family: 'inter';
+    font-weight: 100;
+    font-size: 70px;
+    grid-column: 1 / -1;
+    justify-self: center;
+    margin-top: 12%;
+}
+
+.loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.loader::after {
+    content: "";
+    width: 100px;
+    height: 100px;
+    border: 15px solid #dddddd;
+    border-top-color: black;
+    border-radius: 50%;
+    animation: loading 0.75s ease infinite;
+}
+
+@keyframes loading {
+    from { transform: rotate(0turn); }
+    to { transform: rotate(1turn); }
 }

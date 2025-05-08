@@ -20,8 +20,8 @@ function musicTypeApple() {
 }
 
 
-function getType() { // only allows for spotify right now
-    return "SPOTIFY"
+function getType() { 
+    return musicType
 
 }
 
@@ -29,9 +29,17 @@ function submitPlaylist() {
     const playlist = document.getElementById('Playlist_Field').value;
 
     if (musicType == getType(playlist)) {
-        sendPlaylist()
-    }
+        if (musicType == "APPLE") { alert("Apple Music Is Currently Not Supported"); }
+        else {
+          
+        localStorage.setItem('pendingPlaylist', playlist);
+        localStorage.setItem('pendingMusicType', musicType);
+        window.location.href = "waitingPage.html";
 
+          sendPlaylist()
+
+        }
+    } 
 }
 
 function sendPlaylist() {
@@ -84,7 +92,6 @@ function loadPlaylist() {
     let frameId = frameBase + (count + 1); // e.g., frame1, frame2...
     let code = codes[count].trim(); // trim to remove extra spaces if any
     
-    console.log(code);
     let frameElement = document.getElementById(frameId);
     if (frameElement) {
       frameElement.src = "https://open.spotify.com/embed/track/" + code + "?utm_source=generator";

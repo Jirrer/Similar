@@ -122,8 +122,46 @@ Playlist submittedPlaylist(string url) {
 
 }
 
-bool verifyPlaylist(string uncheckedPlaylist) {
-    string command = "python src/VerifyPlaylist.py \""  + uncheckedPlaylist;
+string getType(string input) {
+    string appleCheck = "apple";
+    string spotifyCheck = "spotify";
+    
+    int appleIndex = 0;
+    int spotifyIndex = 0;
+
+    for (char x : input) {
+        if (tolower(x) == appleCheck[appleIndex]) { appleIndex++; }
+        else if (tolower(x) == spotifyCheck[spotifyIndex]) { spotifyIndex++; }
+
+        if (appleIndex >= 5) { return "APPLE"; }
+        else if (spotifyIndex >= 7) { return "SPOTIFY"; }
+    }
+
+    return NULL;
+}
+
+string parsePlaylist(string input) {
+    int sliceIndex = 0;
+
+    for (int x = 0; x < input.length(); x++) {
+        if (input[x] == '|') { sliceIndex = x; break; }
+    }
+
+    return input.substr(sliceIndex + 1);
+}
+
+bool verifyPlaylist(string playlistType, string uncheckedPlaylist) {
+    string command = "";
+
+    if (playlistType == "Apple") {
+        command = "python src/VerifyApple.py \""  + uncheckedPlaylist;
+    }
+
+    else if (playlistType == "SPOTIFY") {
+        command = "python src/VerifySpotify.py \""  + uncheckedPlaylist;
+    }
+
+
     
     array<char, 128> buffer;
     string result;
@@ -148,7 +186,10 @@ int main() {
     string input;
     getline(cin, input);
 
-    if (!verifyPlaylist(input)) {exit(2); }
+    string playlistType = getType(input);
+    string playlist = parsePlaylist(input);
+
+    if (!verifyPlaylist(playlistType, playlist)) {exit(2); }
 
     int length_of_new_playlist = 30;
 

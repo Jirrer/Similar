@@ -4,9 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Similar - Generating Playlist</title>
+    <link rel = "stylesheet" href = "style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Generating Playlist...</h1>
-    
+    <div id = "loadingTitle">Generating Playlist</div>
+    <div class="loader"></div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+        const playlist = localStorage.getItem('pendingPlaylist');
+        const musicType = localStorage.getItem('pendingMusicType');
+
+        if (!playlist) {
+            alert("No playlist submitted.");
+            window.location.href = "mainPage.html";
+            return;
+        }
+
+        fetch('http://localhost:3000/send', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ playlist, musicType })
+        })
+        .then(response => {
+            if (!response.ok) {
+            return response.json().then(errData => {
+                throw new Error(`Error: ${errData.message}`);
+            });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.code === 2) {
+            alert('Error: Invalid Playlist or Spotify Issue');
+            window.location.href = "mainPage.html";
+            } else {
+            localStorage.setItem('cppOutput', data.cppOutput);
+            window.location.href = "playlistPage.html";
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert(error.message);
+            window.location.href = "mainPage.html";
+        });
+        });
+    </script>
 </body>
 </html>
