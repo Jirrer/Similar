@@ -34,7 +34,8 @@ class Song {
     string getAppleCode() const { return this->appleMusicID; }
 
     bool operator==(const Song& other) const {
-        return toLower(name) == toLower(other.name) &&
+        return toLower(spotifyID) == toLower(other.spotifyID) &&
+               toLower(name) == toLower(other.name) &&
                toLower(artist) == toLower(other.artist);
     }
 };
@@ -50,7 +51,9 @@ namespace std {
                 return lowerStr;
             };
 
-            return hash<string>()(toLower(s.getName())) ^ hash<string>()(toLower(s.getArtist()));
+            return hash<string>()(toLower(s.getSpotifyCode())) ^
+                   hash<string>()(toLower(s.getName())) ^
+                   hash<string>()(toLower(s.getArtist()));
         }
     };
 }

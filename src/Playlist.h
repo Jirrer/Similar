@@ -14,8 +14,12 @@ class Playlist {
     public: 
     Playlist() = default;
 
-    bool songInPlaylist(const Song& song) {
-        return songs.find(song) != songs.end();
+    bool songInPlaylist(const Song& song) const {
+        bool exists = songs.find(song) != songs.end();
+        if (exists) {
+            cout << "Duplicate detected: " << song.getName() << " by " << song.getArtist() << endl;
+        }
+        return exists;
     }
     
     bool addSong(Song song){

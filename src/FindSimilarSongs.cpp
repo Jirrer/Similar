@@ -68,15 +68,15 @@ int findSongs(queue<Song> songs, Playlist& currPlaylist, Playlist& newPlaylist) 
     int addedSongs = 0;
 
     while (!songs.empty()) {
-            Song selectedSong = songs.front();
+        Song selectedSong = songs.front();
 
-            if (!currPlaylist.songInPlaylist(songs.front())) {
-                if (newPlaylist.addSong(songs.front())) { addedSongs++;}
-            }
-            
-            songs.pop();
-
+        if (!currPlaylist.songInPlaylist(selectedSong) && !newPlaylist.songInPlaylist(selectedSong)) {
+            if (newPlaylist.addSong(selectedSong)) { addedSongs++;}
         }
+        
+        songs.pop();
+
+    }
 
     return addedSongs;
     
