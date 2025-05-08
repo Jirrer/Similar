@@ -36,6 +36,12 @@ class Playlist {
 
     int getPlaylistSize() {return songs.size(); }
 
+    void printSpotifyCodes() {
+        for (const Song& song : songs) {
+            cout << song.getSpotifyCode() << "|";
+        }
+    }
+
 };
 
 #endif 

@@ -29,7 +29,7 @@ queue<Song> getNewSongs(int len, Playlist& currPlaylist) {
     queue<Song> newSongs;
     
     
-    string command = "python GetSimilarSongs.py \""  + to_string(len) + "|" + currPlaylist.getPlaylistInfo();
+    string command = "python src/GetSimilarSongs.py \""  + to_string(len) + "|" + currPlaylist.getPlaylistInfo();
     
     array<char, 128> buffer;
     string result;
@@ -38,8 +38,6 @@ queue<Song> getNewSongs(int len, Playlist& currPlaylist) {
     if (!pipe) {
         throw runtime_error("Failed to run Python script!");
     }
-
-    cout << "Generating Playlist..." << endl;
     
     while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
         result += buffer.data(); 
@@ -87,7 +85,7 @@ int findSongs(queue<Song> songs, Playlist& currPlaylist, Playlist& newPlaylist) 
 Playlist submittedPlaylist(string url) {
     Playlist currPlaylist; 
 
-    string command = "python UserPlaylist.py \""  + url;
+    string command = "python src/UserPlaylist.py \""  + url;
     
     array<char, 128> buffer;
     string result;
@@ -124,11 +122,78 @@ Playlist submittedPlaylist(string url) {
 
 }
 
+string getType(string input) {
+    string appleCheck = "apple";
+    string spotifyCheck = "spotify";
+    
+    int appleIndex = 0;
+    int spotifyIndex = 0;
+
+    for (char x : input) {
+        if (tolower(x) == appleCheck[appleIndex]) { appleIndex++; }
+        else if (tolower(x) == spotifyCheck[spotifyIndex]) { spotifyIndex++; }
+
+        if (appleIndex >= 5) { return "APPLE"; }
+        else if (spotifyIndex >= 7) { return "SPOTIFY"; }
+    }
+
+    return NULL;
+}
+
+string parsePlaylist(string input) {
+    int sliceIndex = 0;
+
+    for (int x = 0; x < input.length(); x++) {
+        if (input[x] == '|') { sliceIndex = x; break; }
+    }
+
+    return input.substr(sliceIndex + 1);
+}
+
+bool verifyPlaylist(string playlistType, string uncheckedPlaylist) {
+    string command = "";
+
+    if (playlistType == "Apple") {
+        command = "python src/VerifyApple.py \""  + uncheckedPlaylist;
+    }
+
+    else if (playlistType == "SPOTIFY") {
+        command = "python src/VerifySpotify.py \""  + uncheckedPlaylist;
+    }
+
+
+    
+    array<char, 128> buffer;
+    string result;
+    FILE* pipe = popen(command.c_str(), "r");
+    
+    if (!pipe) {
+        throw runtime_error("Failed to parse user playlist!");
+    }
+    
+    while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
+        result += buffer.data(); 
+    }
+    
+    int exitCode = pclose(pipe);
+
+    if (exitCode == 3) { return false; } 
+    else if (exitCode == 1) { return true; } 
+    else { return true; }
+}
+
 int main() {
+    string input;
+    getline(cin, input);
+
+    string playlistType = getType(input);
+    string playlist = parsePlaylist(input);
+
+    if (!verifyPlaylist(playlistType, playlist)) {exit(2); }
+
     int length_of_new_playlist = 30;
 
-
-    Playlist currPlaylist = submittedPlaylist("https://open.spotify.com/playlist/5h92YREtpdZ2A3ZZnSp3pC?si=efb985420c304d75"); //user submitted
+    Playlist currPlaylist = submittedPlaylist(input); //user submitted
     Playlist newPlaylist; 
 
     int addedSongs = 0;
@@ -137,8 +202,5 @@ int main() {
         addedSongs += findSongs(getNewSongs(length_of_new_playlist - addedSongs, currPlaylist), currPlaylist, newPlaylist);
     }
         
-
-    cout << "\n\nprinting songs";
-    cout << newPlaylist.getPlaylistInfo() << endl;
-    cout << newPlaylist.getPlaylistSize();
+   newPlaylist.printSpotifyCodes();
 }

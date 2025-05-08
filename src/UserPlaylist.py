@@ -12,13 +12,8 @@ client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
 auth_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
 sp = spotipy.Spotify(auth_manager=auth_manager)
 
-
-
-
 def getAppleCode(title):
     return "Null"
-
-
 
 def parseSongs(playlist):
     tracks = playlist['items']
@@ -28,7 +23,7 @@ def parseSongs(playlist):
         track = song['track']
         title = track['name']
         artist = track['artists'][0]['name']
-        spotifyCode = track['id']  # Correct: get ID from the full track object
+        spotifyCode = track['id']  
         appleCode = getAppleCode(title)
 
         songs += (title + "~" + artist + "~" + spotifyCode + "~" + appleCode + "|")
@@ -54,7 +49,7 @@ def getPlayListID(url):
     return output
 
 
-if __name__ == "__main__": # pass in link, only accepts publics links at this time
+if __name__ == "__main__": 
     data = str(sys.argv[1])
     playlistID = getPlayListID(data)
 
