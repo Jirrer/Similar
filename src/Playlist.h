@@ -6,39 +6,46 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <set>
 using namespace std;
 
 class Playlist {
-    private: unordered_set<Song> songs;
+private:
+    set<Song> songs;
 
-    public: 
+    bool duplicate(Song song) {
+
+
+        return false;
+    }
+
+
+public:
     Playlist() = default;
 
-    bool songInPlaylist(const Song& song) const {
-        bool exists = songs.find(song) != songs.end();
-        if (exists) {
-            cout << "Duplicate detected: " << song.getName() << " by " << song.getArtist() << endl;
+    bool addSong(const Song& song) {
+        if (duplicate(song)) {
+            return false;
         }
-        return exists;
-    }
-    
-    bool addSong(Song song){
-        if (!songInPlaylist(song)) { songs.insert(song); return true; }
-        else { return false; }
+
+        else {
+            songs.insert(song);
+            return true;
+        }
+
     }
 
-    string getPlaylistInfo() {
+    string getPlaylistInfo() const {
         string tempSongs;
 
         for (const Song& song : songs) {
-            tempSongs += song.getName() + " | " + song.getArtist() + " | " + song.getSpotifyCode() + " | " + song.getAppleCode();
+            tempSongs += song.getName() + " | " + song.getArtist() + " | " + song.getSpotifyCode() + " | " + song.getAppleCode() + "\n";
         }
 
         return tempSongs;
-
     }
 
-    int getPlaylistSize() {return songs.size(); }
+    int getPlaylistSize() const { return songs.size(); }
 
     void printSpotifyCodes() {
         for (const Song& song : songs) {
@@ -46,6 +53,11 @@ class Playlist {
         }
     }
 
+    void printSongs() {
+        for (const Song& song : songs) {
+            cout << song.getName() << "|";
+        }
+    }
 };
 
-#endif 
+#endif

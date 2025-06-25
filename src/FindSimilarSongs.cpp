@@ -29,7 +29,7 @@ queue<Song> getNewSongs(int len, Playlist& currPlaylist) {
     queue<Song> newSongs;
     
     
-    string command = "python src/GetSimilarSongs.py \""  + to_string(len) + "|" + currPlaylist.getPlaylistInfo();
+    string command = "python GetSimilarSongs.py \""  + to_string(len) + "|" + currPlaylist.getPlaylistInfo();
     
     array<char, 128> buffer;
     string result;
@@ -70,9 +70,8 @@ int findSongs(queue<Song> songs, Playlist& currPlaylist, Playlist& newPlaylist) 
     while (!songs.empty()) {
         Song selectedSong = songs.front();
 
-        if (!currPlaylist.songInPlaylist(selectedSong) && !newPlaylist.songInPlaylist(selectedSong)) {
-            if (newPlaylist.addSong(selectedSong)) { addedSongs++;}
-        }
+        if (newPlaylist.addSong(selectedSong)) { addedSongs++;}
+        
         
         songs.pop();
 
@@ -85,7 +84,7 @@ int findSongs(queue<Song> songs, Playlist& currPlaylist, Playlist& newPlaylist) 
 Playlist submittedPlaylist(string url) {
     Playlist currPlaylist; 
 
-    string command = "python src/UserPlaylist.py \""  + url;
+    string command = "python UserPlaylist.py \""  + url;
     
     array<char, 128> buffer;
     string result;
@@ -154,11 +153,11 @@ bool verifyPlaylist(string playlistType, string uncheckedPlaylist) {
     string command = "";
 
     if (playlistType == "Apple") {
-        command = "python src/VerifyApple.py \""  + uncheckedPlaylist;
+        command = "python VerifyApple.py \""  + uncheckedPlaylist;
     }
 
     else if (playlistType == "SPOTIFY") {
-        command = "python src/VerifySpotify.py \""  + uncheckedPlaylist;
+        command = "python VerifySpotify.py \""  + uncheckedPlaylist;
     }
 
 
@@ -198,9 +197,11 @@ int main() {
 
     int addedSongs = 0;
 
-    while (addedSongs < length_of_new_playlist) {
-        addedSongs += findSongs(getNewSongs(length_of_new_playlist - addedSongs, currPlaylist), currPlaylist, newPlaylist);
-    }
-        
-   newPlaylist.printSpotifyCodes();
+    // while (addedSongs < length_of_new_playlist) {
+    //     addedSongs += findSongs(getNewSongs(length_of_new_playlist - addedSongs, currPlaylist), currPlaylist, newPlaylist);
+    // }
+    
+    currPlaylist.printSongs();
+    newPlaylist.printSpotifyCodes();
+
 }

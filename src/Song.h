@@ -13,13 +13,6 @@ class Song {
     string spotifyID;
     string appleMusicID;
 
-    static string toLower(const string& str) {
-        string lowerStr = str;
-        transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(),
-                  [](unsigned char c){ return tolower(c); });
-        return lowerStr;
-    }
-
     public:
     Song(string name, string artist, string spotifyID, string appleMusicID) { 
         this->name = name; 
@@ -33,29 +26,14 @@ class Song {
     string getSpotifyCode() const { return this->spotifyID; }
     string getAppleCode() const { return this->appleMusicID; }
 
-    bool operator==(const Song& other) const {
-        return toLower(spotifyID) == toLower(other.spotifyID) &&
-               toLower(name) == toLower(other.name) &&
-               toLower(artist) == toLower(other.artist);
+    bool operator<(const Song& other) const {
+        return spotifyID < other.spotifyID; 
     }
+
+    bool operator==(const Song& other) const {
+        return spotifyID == other.spotifyID;
+    }
+
 };
-
-namespace std {
-    template<>
-    struct hash<Song> {
-        size_t operator()(const Song& s) const {
-            auto toLower = [](const string& str) {
-                string lowerStr = str;
-                transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(),
-                          [](unsigned char c){ return tolower(c); });
-                return lowerStr;
-            };
-
-            return hash<string>()(toLower(s.getSpotifyCode())) ^
-                   hash<string>()(toLower(s.getName())) ^
-                   hash<string>()(toLower(s.getArtist()));
-        }
-    };
-}
 
 #endif
