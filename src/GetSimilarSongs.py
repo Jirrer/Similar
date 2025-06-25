@@ -50,8 +50,8 @@ def valididateSongInfo(info):
 def getSongs(num, info):
     genai.configure(api_key = os.getenv('GEMINI_API_KEY'))
 
-    model = genai.GenerativeModel('gemini-2.0-flash')
-
+    model = genai.GenerativeModel('gemini-1.5-flash')
+    
     prompt = f'''
     Give me {num} similar songs to the following list of songs: {info}. I want you to format in this way: TITLE~Artist|
     make sure it is exactly {num} new songs

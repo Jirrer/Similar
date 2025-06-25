@@ -10,6 +10,14 @@
 #include <sstream>
 #include <vector>
 
+#ifdef _WIN32
+#include <cstdio>
+#define popen _popen
+#define pclose _pclose
+#else
+#include <cstdio>
+#endif
+
 using namespace std;
 
 
@@ -29,7 +37,7 @@ queue<Song> getNewSongs(int len, Playlist& currPlaylist) {
     queue<Song> newSongs;
     
     
-    string command = "python GetSimilarSongs.py \""  + to_string(len) + "|" + currPlaylist.getPlaylistInfo();
+    string command = "python src/GetSimilarSongs.py \""  + to_string(len) + "|" + currPlaylist.getPlaylistInfo();
     
     array<char, 128> buffer;
     string result;
@@ -84,7 +92,7 @@ int findSongs(queue<Song> songs, Playlist& currPlaylist, Playlist& newPlaylist) 
 Playlist submittedPlaylist(string url) {
     Playlist currPlaylist; 
 
-    string command = "python UserPlaylist.py \""  + url;
+    string command = "python src/UserPlaylist.py \""  + url;
     
     array<char, 128> buffer;
     string result;
@@ -153,11 +161,11 @@ bool verifyPlaylist(string playlistType, string uncheckedPlaylist) {
     string command = "";
 
     if (playlistType == "Apple") {
-        command = "python VerifyApple.py \""  + uncheckedPlaylist;
+        command = "python src/VerifyApple.py \""  + uncheckedPlaylist;
     }
 
     else if (playlistType == "SPOTIFY") {
-        command = "python VerifySpotify.py \""  + uncheckedPlaylist;
+        command = "python src/VerifySpotify.py \"" + uncheckedPlaylist + "\"";
     }
 
 

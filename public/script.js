@@ -25,19 +25,27 @@ function getType() {
 
 }
 
+function isValidSpotifyPlaylist(url) {
+  // Spotify playlist URLs are typically like: https://open.spotify.com/playlist/xxxxxxxxxxxxxxxxxxxxxx
+  const regex = /^https:\/\/open\.spotify\.com\/playlist\/[a-zA-Z0-9]{22}/;
+  return regex.test(url.trim());
+}
+
 function submitPlaylist() {
     const playlist = document.getElementById('Playlist_Field').value;
 
     if (musicType == getType(playlist)) {
-        if (musicType == "APPLE") { alert("Apple Music Is Currently Not Supported"); }
-        else {
-          
-        localStorage.setItem('pendingPlaylist', playlist);
-        localStorage.setItem('pendingMusicType', musicType);
-        window.location.href = "waitingPage.html";
-
-          sendPlaylist()
-
+        if (musicType == "APPLE") { 
+          alert("Apple Music Is Currently Not Supported"); 
+        } else {
+          if (!isValidSpotifyPlaylist(playlist)) {
+            alert("Please enter a valid Spotify playlist URL.");
+            return;
+          }
+          localStorage.setItem('pendingPlaylist', playlist);
+          localStorage.setItem('pendingMusicType', musicType);
+          window.location.href = "waitingPage.html";
+          sendPlaylist();
         }
     } 
 }
